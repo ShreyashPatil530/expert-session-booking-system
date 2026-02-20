@@ -4,6 +4,7 @@ const Expert = require('../models/Expert');
 // @route   GET /api/experts
 // @access  Public
 exports.getExperts = async (req, res) => {
+    console.log('GET /api/experts request received with query:', req.query);
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
