@@ -28,6 +28,7 @@ const ExpertListing = () => {
                 setTotalPages(data.pagination.pages);
                 setError(null);
             } catch (err) {
+                console.error('Expert Fetch Error:', err);
                 setError('Failed to fetch experts. Please try again later.');
             } finally {
                 setLoading(false);
@@ -70,8 +71,8 @@ const ExpertListing = () => {
                                     setPage(1);
                                 }}
                                 className={`flex-shrink-0 px-6 py-3 rounded-xl font-medium transition-all ${selectedCategory === category
-                                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/40'
-                                        : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/40'
+                                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
                                     }`}
                             >
                                 {category}
