@@ -3,7 +3,7 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const cors = require('cors');
-const connectDB = require('./config/db');
+const { connectDB, getLastError } = require('./config/db');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,11 +29,20 @@ app.get('/', (req, res) => {
 // Health check route for database
 app.get('/health', (req, res) => {
     const mongoose = require('mongoose');
-    const status = mongoose.connection.readyState === 1 ? 'Connected' : 'Connecting/Disconnected';
+    const readyState = mongoose.connection.readyState;
+    const states = {
+        0: 'disconnected',
+        1: 'connected',
+        2: 'connecting',
+        3: 'disconnecting'
+    };
+
     res.json({
-        status,
+        status: states[readyState] || 'unknown',
         database: mongoose.connection.name || 'Not Connected',
-        env: process.env.NODE_ENV
+        lastError: getLastError(),
+        env: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -50,14 +59,12 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5001;
 
-// Bind to port immediately to satisfy Render's health check
+// Bind to port immediately
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server listening on port ${PORT}`);
 
-    // Connect to database after binding to port
-    connectDB().then(() => {
-        console.log('✅ Background DB connection successful');
-    }).catch(err => {
-        console.error('❌ Background DB connection failed:', err.message);
+    // Background connection
+    connectDB().catch(err => {
+        console.error('Initial DB connection trigger failed:', err.message);
     });
 });

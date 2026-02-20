@@ -1,10 +1,20 @@
 const Expert = require('../models/Expert');
+const mongoose = require('mongoose');
 
 // @desc    Get all experts
 // @route   GET /api/experts
 // @access  Public
 exports.getExperts = async (req, res) => {
-    console.log('GET /api/experts request received with query:', req.query);
+    console.log('GET /api/experts request received');
+
+    // Check if DB is connected
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is still connecting or disconnected. Please try again in a moment.'
+        });
+    }
+
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
@@ -39,6 +49,7 @@ exports.getExperts = async (req, res) => {
             data: experts
         });
     } catch (error) {
+        console.error('getExperts Error:', error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 };
@@ -47,6 +58,10 @@ exports.getExperts = async (req, res) => {
 // @route   GET /api/experts/:id
 // @access  Public
 exports.getExpert = async (req, res) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({ success: false, error: 'Database is not connected.' });
+    }
+
     try {
         const expert = await Expert.findById(req.params.id);
 
