@@ -64,9 +64,9 @@ A premium Real-Time Expert Session Booking System built with the MERN stack.
 
 ### Frontend (Vercel/Netlify)
 1. Deploy the `frontend` folder.
-2. Set Environment Variables:
-   - `VITE_API_URL`: Your deployed backend URL + `/api`.
-   - `VITE_SOCKET_URL`: Your deployed backend URL.
+2. Set Environment Variables in your deployment dashboard:
+   - `VITE_API_URL`: `https://expert-session-booking-system.onrender.com/api`
+   - `VITE_SOCKET_URL`: `https://expert-session-booking-system.onrender.com`
 
 ## Key Implementations
 
