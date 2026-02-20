@@ -5,7 +5,11 @@ const connectDB = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    if (error.message.includes('whitelist')) {
+      console.error('👉 ATTENTION: Your current IP address might not be whitelisted in MongoDB Atlas.');
+      console.error('Please go to MongoDB Atlas -> Network Access and add "0.0.0.0/0" or your current IP.');
+    }
     process.exit(1);
   }
 };
