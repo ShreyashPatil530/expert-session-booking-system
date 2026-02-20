@@ -27,10 +27,14 @@ app.get('/', (req, res) => {
 });
 
 // Health check route for database
-app.get('/health', async (req, res) => {
+app.get('/health', (req, res) => {
     const mongoose = require('mongoose');
-    const status = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
-    res.json({ status, database: mongoose.connection.name });
+    const status = mongoose.connection.readyState === 1 ? 'Connected' : 'Connecting/Disconnected';
+    res.json({
+        status,
+        database: mongoose.connection.name || 'Not Connected',
+        env: process.env.NODE_ENV
+    });
 });
 
 app.use('/api/experts', require('./routes/expertRoutes'));
@@ -46,17 +50,14 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5001;
 
-// Connect to database then listen
-const startServer = async () => {
-    try {
-        await connectDB();
-        server.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
-};
+// Bind to port immediately to satisfy Render's health check
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server listening on port ${PORT}`);
 
-startServer();
+    // Connect to database after binding to port
+    connectDB().then(() => {
+        console.log('✅ Background DB connection successful');
+    }).catch(err => {
+        console.error('❌ Background DB connection failed:', err.message);
+    });
+});
