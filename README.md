@@ -49,6 +49,25 @@ A premium Real-Time Expert Session Booking System built with the MERN stack.
    npm run dev
    ```
 
+## Deployment
+
+### Backend (Render)
+1. Create a new **Web Service** on Render.
+2. Connect this GitHub repository.
+3. Set **Root Directory** to `backend`.
+4. Set **Build Command** to `npm install`.
+5. Set **Start Command** to `npm start`.
+6. Add Environment Variables:
+   - `MONGODB_URI`: Your MongoDB connection string.
+   - `PORT`: 10000 (or leave default).
+   - `NODE_ENV`: production.
+
+### Frontend (Vercel/Netlify)
+1. Deploy the `frontend` folder.
+2. Set Environment Variables:
+   - `VITE_API_URL`: Your deployed backend URL + `/api`.
+   - `VITE_SOCKET_URL`: Your deployed backend URL.
+
 ## Key Implementations
 
 ### Race Condition Prevention
