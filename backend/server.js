@@ -5,14 +5,11 @@ const socketio = require('socket.io');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to database
-connectDB();
-
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
     cors: {
-        origin: '*', // In production, restrict to your frontend URL
+        origin: '*',
         methods: ['GET', 'POST']
     }
 });
@@ -28,20 +25,38 @@ app.set('socketio', io);
 app.get('/', (req, res) => {
     res.send('ExpertConnect Backend is running successfully!');
 });
+
+// Health check route for database
+app.get('/health', async (req, res) => {
+    const mongoose = require('mongoose');
+    const status = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+    res.json({ status, database: mongoose.connection.name });
+});
+
 app.use('/api/experts', require('./routes/expertRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Socket.io connection logic
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
-
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+// Connect to database then listen
+const startServer = async () => {
+    try {
+        await connectDB();
+        server.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
