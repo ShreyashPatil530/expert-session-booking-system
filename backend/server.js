@@ -25,6 +25,9 @@ app.use(cors());
 app.set('socketio', io);
 
 // Define Routes
+app.get('/', (req, res) => {
+    res.send('ExpertConnect Backend is running successfully!');
+});
 app.use('/api/experts', require('./routes/expertRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
